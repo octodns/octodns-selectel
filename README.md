@@ -1,5 +1,3 @@
-TODO: Review this README and add or modify as necessary.
-
 ## Selectel DNS provider for octoDNS
 
 An [octoDNS](https://github.com/octodns/octodns/) provider that targets [Selectel DNS](https://selectel.ru/en/services/additional/dns/).
@@ -38,21 +36,19 @@ octodns_selectel==0.0.1
 providers:
   selectel:
     class: octodns_selectel.SelectelProvider
-    # TODO
+    token: env/SELECTEL_TOKEN
 ```
 
 ### Support Information
 
 #### Records
 
-TODO: All octoDNS record types are supported.
+SelectelProvider supports A, AAAA, CNAME, MX, NS, SPF, SRV, and TXT
 
 #### Dynamic
 
-TODO: SelectelProvider does not support dynamic records.
+SelectelProvider does not support dynamic records.
 
 ### Development
 
 See the [/script/](/script/) directory for some tools to help with the development process. They generally follow the [Script to rule them all](https://github.com/github/scripts-to-rule-them-all) pattern. Most useful is `./script/bootstrap` which will create a venv and install both the runtime and development related requirements. It will also hook up a pre-commit hook that covers most of what's run by CI.
-
-TODO: any provider specific setup, a docker compose to run things locally etc?
