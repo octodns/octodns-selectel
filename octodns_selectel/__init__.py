@@ -29,7 +29,7 @@ class SelectelAuthenticationRequired(ProviderException):
 class SelectelProvider(BaseProvider):
     SUPPORTS_GEO = False
 
-    SUPPORTS = set(('A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT', 'SPF', 'SRV'))
+    SUPPORTS = set(('A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT', 'SRV'))
 
     MIN_TTL = 60
 
@@ -159,7 +159,6 @@ class SelectelProvider(BaseProvider):
     _params_for_AAAA = _params_for_multiple
     _params_for_NS = _params_for_multiple
     _params_for_TXT = _params_for_multiple
-    _params_for_SPF = _params_for_multiple
 
     _params_for_CNAME = _params_for_single
 
@@ -301,7 +300,7 @@ class SelectelProvider(BaseProvider):
         for record in records:
             full_domain = domain
             if zone:
-                full_domain = f'{zone}{domain}'
+                full_domain = f'{zone}.{domain}'
             if record['type'] == _type and record['name'] == full_domain:
                 path = f'/{domain_id}/records/{record["id"]}'
                 return self._request('DELETE', path)

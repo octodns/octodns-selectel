@@ -43,7 +43,7 @@ providers:
 
 #### Records
 
-SelectelProvider supports A, AAAA, CNAME, MX, NS, SPF, SRV, and TXT
+SelectelProvider supports A, AAAA, CNAME, MX, NS, SRV, and TXT
 
 #### Dynamic
 
