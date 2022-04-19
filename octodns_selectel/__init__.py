@@ -12,7 +12,7 @@ from octodns.record import Record, Update
 from octodns.provider import ProviderException
 from octodns.provider.base import BaseProvider
 
-__VERSION__ = '0.0.2'
+__VERSION__ = '0.0.1'
 
 
 def escape_semicolon(s):
