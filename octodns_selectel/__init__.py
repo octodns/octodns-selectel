@@ -29,7 +29,9 @@ class SelectelAuthenticationRequired(ProviderException):
 class SelectelProvider(BaseProvider):
     SUPPORTS_GEO = False
 
-    SUPPORTS = set(('A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT', 'SRV', 'SSHFP'))
+    SUPPORTS = set(
+        ('A', 'AAAA', 'ALIAS', 'CNAME', 'MX', 'NS', 'TXT', 'SRV', 'SSHFP')
+    )
 
     MIN_TTL = 60
 
@@ -172,6 +174,7 @@ class SelectelProvider(BaseProvider):
     _params_for_TXT = _params_for_multiple
 
     _params_for_CNAME = _params_for_single
+    _params_for_ALIAS = _params_for_single
 
     def _data_for_A(self, _type, records):
         return {
@@ -209,6 +212,8 @@ class SelectelProvider(BaseProvider):
             'type': _type,
             'value': f'{only["content"]}.',
         }
+
+    _data_for_ALIAS = _data_for_CNAME
 
     def _data_for_TXT(self, _type, records):
         return {
