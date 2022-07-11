@@ -29,7 +29,9 @@ class SelectelAuthenticationRequired(ProviderException):
 class SelectelProvider(BaseProvider):
     SUPPORTS_GEO = False
 
-    SUPPORTS = set(('A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT', 'SRV'))
+    SUPPORTS = set(
+        ('A', 'AAAA', 'ALIAS', 'CNAME', 'MX', 'NS', 'TXT', 'SRV', 'SSHFP')
+    )
 
     MIN_TTL = 60
 
@@ -158,12 +160,24 @@ class SelectelProvider(BaseProvider):
                 'priority': value.priority,
             }
 
+    def _params_for_SSHFP(self, record):
+        for value in record.values:
+            yield {
+                'name': record.fqdn,
+                'ttl': max(self.MIN_TTL, record.ttl),
+                'type': record._type,
+                'algorithm': value.algorithm,
+                'fingerprint_type': value.fingerprint_type,
+                'fingerprint': value.fingerprint,
+            }
+
     _params_for_A = _params_for_multiple
     _params_for_AAAA = _params_for_multiple
     _params_for_NS = _params_for_multiple
     _params_for_TXT = _params_for_multiple
 
     _params_for_CNAME = _params_for_single
+    _params_for_ALIAS = _params_for_single
 
     def _data_for_A(self, _type, records):
         return {
@@ -200,6 +214,8 @@ class SelectelProvider(BaseProvider):
             'value': f'{only["content"]}.',
         }
 
+    _data_for_ALIAS = _data_for_CNAME
+
     def _data_for_TXT(self, _type, records):
         return {
             'ttl': records[0]['ttl'],
@@ -216,6 +232,19 @@ class SelectelProvider(BaseProvider):
                     'weight': record['weight'],
                     'port': record['port'],
                     'target': f'{record["target"]}.',
+                }
+            )
+
+        return {'type': _type, 'ttl': records[0]['ttl'], 'values': values}
+
+    def _data_for_SSHFP(self, _type, records):
+        values = []
+        for record in records:
+            values.append(
+                {
+                    'algorithm': record['algorithm'],
+                    'fingerprint_type': record['fingerprint_type'],
+                    'fingerprint': f'{record["fingerprint"]}.',
                 }
             )
 

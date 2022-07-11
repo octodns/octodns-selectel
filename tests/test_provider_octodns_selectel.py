@@ -232,6 +232,34 @@ class TestSelectelProvider(TestCase):
         )
     )
 
+    # SSHFP
+    api_record.append(
+        {
+            'type': 'SSHFP',
+            'ttl': 800,
+            'algorithm': 1,
+            'fingerprint_type': 1,
+            'fingerprint': "123456789abcdef",
+            'id': 17,
+            'name': 'sshfp.unit.tests',
+        }
+    )
+    expected.add(
+        Record.new(
+            zone,
+            'sshfp',
+            {
+                'ttl': 800,
+                'type': 'SSHFP',
+                'value': {
+                    'algorithm': 1,
+                    'fingerprint_type': 1,
+                    'fingerprint': "123456789abcdef",
+                },
+            },
+        )
+    )
+
     @requests_mock.Mocker()
     def test_populate(self, fake_http):
         zone = Zone('unit.tests.', [])
@@ -324,8 +352,8 @@ class TestSelectelProvider(TestCase):
             zone.add_record(record)
 
         plan = provider.plan(zone)
-        self.assertEqual(8, len(plan.changes))
-        self.assertEqual(8, provider.apply(plan))
+        self.assertEqual(9, len(plan.changes))
+        self.assertEqual(9, provider.apply(plan))
 
     @requests_mock.Mocker()
     def test_domain_list(self, fake_http):
@@ -383,8 +411,8 @@ class TestSelectelProvider(TestCase):
             zone.add_record(record)
 
         plan = provider.plan(zone)
-        self.assertEqual(8, len(plan.changes))
-        self.assertEqual(8, provider.apply(plan))
+        self.assertEqual(9, len(plan.changes))
+        self.assertEqual(9, provider.apply(plan))
 
     @requests_mock.Mocker()
     def test_delete_no_exist_record(self, fake_http):
@@ -449,8 +477,8 @@ class TestSelectelProvider(TestCase):
             zone.add_record(record)
 
         plan = provider.plan(zone)
-        self.assertEqual(8, len(plan.changes))
-        self.assertEqual(8, provider.apply(plan))
+        self.assertEqual(9, len(plan.changes))
+        self.assertEqual(9, provider.apply(plan))
 
     @requests_mock.Mocker()
     def test_include_change_returns_false(self, fake_http):

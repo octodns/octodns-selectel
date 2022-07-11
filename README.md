@@ -18,8 +18,8 @@ Pinning specific versions or SHAs is recommended to avoid unplanned upgrades.
 
 ```
 # Start with the latest versions and don't just copy what's here
-octodns==0.9.14
-octodns_selectel==0.0.1
+octodns==0.9.17
+octodns_selectel==0.0.3
 ```
 
 ##### SHAs
@@ -43,7 +43,7 @@ providers:
 
 #### Records
 
-SelectelProvider supports A, AAAA, CNAME, MX, NS, SRV, and TXT
+SelectelProvider supports A, AAAA, ALIAS, CNAME, MX, NS, SRV, SSHFP and TXT
 
 #### Dynamic
 
