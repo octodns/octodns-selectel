@@ -43,10 +43,9 @@ class SelectelProvider(BaseProvider):
         super(SelectelProvider, self).__init__(id, *args, **kwargs)
 
         self._sess = Session()
-        self._sess.headers.update({
-            'X-Token': token,
-            'Content-Type': 'application/json',
-        })
+        self._sess.headers.update(
+            {'X-Token': token, 'Content-Type': 'application/json'}
+        )
         self._zone_records = {}
         self._domain_list = self.domain_list()
         self._zones = None
@@ -75,9 +74,11 @@ class SelectelProvider(BaseProvider):
     def _request_with_pagination(self, path, total_count):
         result = []
         for offset in range(0, total_count, self.PAGINATION_LIMIT):
-            result += self._request('GET', path,
-                                    params={'limit': self.PAGINATION_LIMIT,
-                                            'offset': offset})
+            result += self._request(
+                'GET',
+                path,
+                params={'limit': self.PAGINATION_LIMIT, 'offset': offset},
+            )
         return result
 
     def _include_change(self, change):
@@ -86,16 +87,18 @@ class SelectelProvider(BaseProvider):
             new = change.new.data
             new['ttl'] = max(self.MIN_TTL, new['ttl'])
             if new == existing:
-                self.log.debug('_include_changes: new=%s, found existing=%s',
-                               new, existing)
+                self.log.debug(
+                    '_include_changes: new=%s, found existing=%s', new, existing
+                )
                 return False
         return True
 
     def _apply(self, plan):
         desired = plan.desired
         changes = plan.changes
-        self.log.debug('_apply: zone=%s, len(changes)=%d', desired.name,
-                       len(changes))
+        self.log.debug(
+            '_apply: zone=%s, len(changes)=%d', desired.name, len(changes)
+        )
 
         zone_name = desired.name[:-1]
         for change in changes:
@@ -130,7 +133,7 @@ class SelectelProvider(BaseProvider):
             'content': record.value,
             'name': record.fqdn,
             'ttl': max(self.MIN_TTL, record.ttl),
-            'type': record._type
+            'type': record._type,
         }
 
     def _params_for_MX(self, record):
@@ -140,7 +143,7 @@ class SelectelProvider(BaseProvider):
                 'name': record.fqdn,
                 'ttl': max(self.MIN_TTL, record.ttl),
                 'type': record._type,
-                'priority': value.preference
+                'priority': value.preference,
             }
 
     def _params_for_SRV(self, record):
@@ -152,7 +155,7 @@ class SelectelProvider(BaseProvider):
                 'type': record._type,
                 'port': value.port,
                 'weight': value.weight,
-                'priority': value.priority
+                'priority': value.priority,
             }
 
     _params_for_A = _params_for_multiple
@@ -181,15 +184,13 @@ class SelectelProvider(BaseProvider):
     def _data_for_MX(self, _type, records):
         values = []
         for record in records:
-            values.append({
-                'preference': record['priority'],
-                'exchange': f'{record["content"]}.',
-            })
-        return {
-            'ttl': records[0]['ttl'],
-            'type': _type,
-            'values': values,
-        }
+            values.append(
+                {
+                    'preference': record['priority'],
+                    'exchange': f'{record["content"]}.',
+                }
+            )
+        return {'ttl': records[0]['ttl'], 'type': _type, 'values': values}
 
     def _data_for_CNAME(self, _type, records):
         only = records[0]
@@ -203,28 +204,30 @@ class SelectelProvider(BaseProvider):
         return {
             'ttl': records[0]['ttl'],
             'type': _type,
-            'values': [escape_semicolon(r['content']) for r in records]
+            'values': [escape_semicolon(r['content']) for r in records],
         }
 
     def _data_for_SRV(self, _type, records):
         values = []
         for record in records:
-            values.append({
-                'priority': record['priority'],
-                'weight': record['weight'],
-                'port': record['port'],
-                'target': f'{record["target"]}.',
-            })
+            values.append(
+                {
+                    'priority': record['priority'],
+                    'weight': record['weight'],
+                    'port': record['port'],
+                    'target': f'{record["target"]}.',
+                }
+            )
 
-        return {
-            'type': _type,
-            'ttl': records[0]['ttl'],
-            'values': values,
-        }
+        return {'type': _type, 'ttl': records[0]['ttl'], 'values': values}
 
     def populate(self, zone, target=False, lenient=False):
-        self.log.debug('populate: name=%s, target=%s, lenient=%s',
-                       zone.name, target, lenient)
+        self.log.debug(
+            'populate: name=%s, target=%s, lenient=%s',
+            zone.name,
+            target,
+            lenient,
+        )
         before = len(zone.records)
         records = self.zone_records(zone)
         if records:
@@ -238,11 +241,13 @@ class SelectelProvider(BaseProvider):
                 for _type, records in types.items():
                     data_for = getattr(self, f'_data_for_{_type}')
                     data = data_for(_type, records)
-                    record = Record.new(zone, name, data, source=self,
-                                        lenient=lenient)
+                    record = Record.new(
+                        zone, name, data, source=self, lenient=lenient
+                    )
                     zone.add_record(record)
-        self.log.info('populate:   found %s records',
-                      len(zone.records) - before)
+        self.log.info(
+            'populate:   found %s records', len(zone.records) - before
+        )
 
     def domain_list(self):
         path = '/'
@@ -269,10 +274,7 @@ class SelectelProvider(BaseProvider):
     def create_domain(self, name, zone=""):
         path = '/'
 
-        data = {
-            'name': name,
-            'bind_zone': zone,
-        }
+        data = {'name': name, 'bind_zone': zone}
 
         resp = self._request('POST', path, data=data)
         self._domain_list[name] = resp
