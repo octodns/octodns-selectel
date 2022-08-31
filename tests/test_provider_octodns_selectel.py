@@ -5,6 +5,7 @@
 from unittest import TestCase
 
 import requests_mock
+from requests.exceptions import HTTPError
 
 from octodns.record import Record, Update
 from octodns.zone import Zone
@@ -500,3 +501,20 @@ class TestSelectelProvider(TestCase):
         include_change = provider._include_change(change)
 
         self.assertFalse(include_change)
+
+    @requests_mock.Mocker()
+    def test_fail_record_deletion(self, fake_http):
+        fake_http.get(f'{self.API_URL}/', json=self.domain)
+        record = dict(id=1, type="NS", name="unit.tests")
+        fake_http.get(f'{self.API_URL}/100000/records/', json=[record])
+        fake_http.head(
+            f'{self.API_URL}/', headers={'X-Total-Count': str(len(self.domain))}
+        )
+        fake_http.head(
+            f'{self.API_URL}/unit.tests/records/',
+            headers={'X-Total-Count': '1'},
+        )
+        fake_http.delete(f'{self.API_URL}/100000/records/1', exc=HTTPError)
+        provider = SelectelProvider(123, 'test_token')
+
+        provider.delete_record('unit.tests', 'NS', None)

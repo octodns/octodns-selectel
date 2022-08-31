@@ -7,6 +7,7 @@ from collections import defaultdict
 from logging import getLogger
 
 from requests import Session
+from requests.exceptions import HTTPError
 
 from octodns.record import Record, Update
 from octodns.provider import ProviderException
@@ -320,20 +321,26 @@ class SelectelProvider(BaseProvider):
         return self._request('POST', path, data=data)
 
     def delete_record(self, domain, _type, zone):
-        self.log.debug('Delete record. Domain: %s, Type: %s', domain, _type)
-
+        self.log.debug('Delete records. Domain: %s, Type: %s', domain, _type)
         domain_id = self._domain_list[domain]['id']
         records = self._zone_records.get(f'{domain}.', False)
         if not records:
             path = f'/{domain_id}/records/'
             records = self._request('GET', path)
 
+        full_domain = f'{zone}.{domain}' if zone else domain
+        delete_count, skip_count = 0, 0
         for record in records:
-            full_domain = domain
-            if zone:
-                full_domain = f'{zone}.{domain}'
             if record['type'] == _type and record['name'] == full_domain:
-                path = f'/{domain_id}/records/{record["id"]}'
-                return self._request('DELETE', path)
+                record_id = record["id"]
+                path = f'/{domain_id}/records/{record_id}'
+                try:
+                    self._request('DELETE', path)
+                    delete_count += 1
+                except HTTPError:
+                    skip_count += 1
+                    self.log.warning(f'Failed to delete record {record_id}')
 
-        self.log.debug('Delete record failed (Record not found)')
+        self.log.debug(
+            f'Deleted {delete_count} records. Skipped {skip_count} records'
+        )
