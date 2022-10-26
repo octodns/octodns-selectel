@@ -24,7 +24,7 @@ def escape_semicolon(s):
 class SelectelAuthenticationRequired(ProviderException):
     def __init__(self, msg):
         message = 'Authorization failed. Invalid or empty token.'
-        super(SelectelAuthenticationRequired, self).__init__(message)
+        super().__init__(message)
 
 
 class SelectelProvider(BaseProvider):
@@ -43,7 +43,7 @@ class SelectelProvider(BaseProvider):
     def __init__(self, id, token, *args, **kwargs):
         self.log = getLogger(f'SelectelProvider[{id}]')
         self.log.debug('__init__: id=%s', id)
-        super(SelectelProvider, self).__init__(id, *args, **kwargs)
+        super().__init__(id, *args, **kwargs)
 
         self._sess = Session()
         self._sess.headers.update(
