@@ -7,7 +7,7 @@ An [octoDNS](https://github.com/octodns/octodns/) provider that targets [Selecte
 #### Command line
 
 ```
-pip install octodns_selectel
+pip install octodns-selectel
 ```
 
 #### requirements.txt/setup.py
@@ -19,7 +19,7 @@ Pinning specific versions or SHAs is recommended to avoid unplanned upgrades.
 ```
 # Start with the latest versions and don't just copy what's here
 octodns==0.9.17
-octodns_selectel==0.0.3
+octodns-selectel==0.0.3
 ```
 
 ##### SHAs
