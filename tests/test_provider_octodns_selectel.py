@@ -345,7 +345,7 @@ class TestSelectelProvider(TestCase):
         )
         fake_http.post(f'{self.API_URL}/100000/records/', json=list())
 
-        provider = SelectelProvider(123, 'test_token')
+        provider = SelectelProvider(123, 'test_token', strict_supports=False)
 
         zone = Zone('unit.tests.', [])
 
@@ -404,7 +404,7 @@ class TestSelectelProvider(TestCase):
         )
         fake_http.post(f'{self.API_URL}/100000/records/', json=list())
 
-        provider = SelectelProvider(123, 'test_token')
+        provider = SelectelProvider(123, 'test_token', strict_supports=False)
 
         zone = Zone('unit.tests.', [])
 
@@ -470,7 +470,7 @@ class TestSelectelProvider(TestCase):
         fake_http.delete(f'{self.API_URL}/100000/records/100001', text="")
         fake_http.delete(f'{self.API_URL}/100000/records/100002', text="")
 
-        provider = SelectelProvider(123, 'test_token')
+        provider = SelectelProvider(123, 'test_token', strict_supports=False)
 
         zone = Zone('unit.tests.', [])
 
