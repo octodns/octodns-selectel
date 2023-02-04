@@ -3,15 +3,14 @@
 #
 
 from collections import defaultdict
-
 from logging import getLogger
 
 from requests import Session
 from requests.exceptions import HTTPError
 
-from octodns.record import Record, Update
 from octodns.provider import ProviderException
 from octodns.provider.base import BaseProvider
+from octodns.record import Record, Update
 
 __VERSION__ = '0.0.3'
 

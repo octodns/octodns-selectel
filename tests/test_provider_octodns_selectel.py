@@ -333,7 +333,6 @@ class TestSelectelProvider(TestCase):
 
     @requests_mock.Mocker()
     def test_apply(self, fake_http):
-
         fake_http.get(f'{self.API_URL}/unit.tests/records/', json=list())
         fake_http.get(f'{self.API_URL}/', json=self.domain)
         fake_http.head(
