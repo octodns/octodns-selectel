@@ -8,6 +8,7 @@ from logging import getLogger
 from requests import Session
 from requests.exceptions import HTTPError
 
+from octodns import __VERSION__ as octodns_version
 from octodns.provider import ProviderException
 from octodns.provider.base import BaseProvider
 from octodns.record import Record, Update
@@ -46,7 +47,11 @@ class SelectelProvider(BaseProvider):
 
         self._sess = Session()
         self._sess.headers.update(
-            {'X-Token': token, 'Content-Type': 'application/json'}
+            {
+                'X-Token': token,
+                'Content-Type': 'application/json',
+                'User-Agent': f'octodns/{octodns_version} octodns-selectel/{__VERSION__}',
+            }
         )
         self._zone_records = {}
         self._domain_list = self.domain_list()
