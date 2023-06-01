@@ -197,7 +197,7 @@ class SelectelProvider(BaseProvider):
         return {
             'ttl': records[0]['ttl'],
             'type': _type,
-            'values': [f'{r["content"]}.' for r in records],
+            'values': [r["content"] if r["content"].endswith('.') else f'{r["content"]}.' for r in records]
         }
 
     def _data_for_MX(self, _type, records):
@@ -206,7 +206,7 @@ class SelectelProvider(BaseProvider):
             values.append(
                 {
                     'preference': record['priority'],
-                    'exchange': f'{record["content"]}.',
+                    'exchange': record["content"] if record["content"].endswith('.') else f'{record["content"]}.',
                 }
             )
         return {'ttl': records[0]['ttl'], 'type': _type, 'values': values}
@@ -216,7 +216,7 @@ class SelectelProvider(BaseProvider):
         return {
             'ttl': only['ttl'],
             'type': _type,
-            'value': f'{only["content"]}.',
+            'value': only["content"] if only["content"].endswith('.') else f'{only["content"]}.',
         }
 
     _data_for_ALIAS = _data_for_CNAME
@@ -236,7 +236,7 @@ class SelectelProvider(BaseProvider):
                     'priority': record['priority'],
                     'weight': record['weight'],
                     'port': record['port'],
-                    'target': f'{record["target"]}.',
+                    'target': record["target"] if record["target"].endswith('.') else f'{record["target"]}.',
                 }
             )
 
