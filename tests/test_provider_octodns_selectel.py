@@ -78,7 +78,9 @@ class TestSelectelProvider(TestCase):
     )
     expected.add(
         Record.new(
-            zone, 'wwwdot', {'ttl': 300, 'type': 'CNAME', 'value': 'unit.tests.'}
+            zone,
+            'wwwdot',
+            {'ttl': 300, 'type': 'CNAME', 'value': 'unit.tests.'},
         )
     )
 
@@ -140,7 +142,11 @@ class TestSelectelProvider(TestCase):
             {
                 'ttl': 600,
                 'type': 'NS',
-                'values': ['ns1.unit.tests.', 'ns2.unit.tests.', 'ns3.unit.tests.'],
+                'values': [
+                    'ns1.unit.tests.',
+                    'ns2.unit.tests.',
+                    'ns3.unit.tests.',
+                ],
             },
         )
     )
