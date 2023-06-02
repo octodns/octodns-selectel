@@ -21,6 +21,13 @@ def escape_semicolon(s):
     return s.replace(';', '\\;')
 
 
+def require_root_domain(fqdn):
+    if fqdn.endswith('.'):
+        return fqdn
+
+    return f'{fqdn}.'
+
+
 class SelectelAuthenticationRequired(ProviderException):
     def __init__(self, msg):
         message = 'Authorization failed. Invalid or empty token.'
@@ -197,7 +204,7 @@ class SelectelProvider(BaseProvider):
         return {
             'ttl': records[0]['ttl'],
             'type': _type,
-            'values': [r["content"] if r["content"].endswith('.') else f'{r["content"]}.' for r in records]
+            'values': [require_root_domain(r["content"]) for r in records],
         }
 
     def _data_for_MX(self, _type, records):
@@ -206,7 +213,7 @@ class SelectelProvider(BaseProvider):
             values.append(
                 {
                     'preference': record['priority'],
-                    'exchange': record["content"] if record["content"].endswith('.') else f'{record["content"]}.',
+                    'exchange': require_root_domain(record["content"]),
                 }
             )
         return {'ttl': records[0]['ttl'], 'type': _type, 'values': values}
@@ -216,7 +223,7 @@ class SelectelProvider(BaseProvider):
         return {
             'ttl': only['ttl'],
             'type': _type,
-            'value': only["content"] if only["content"].endswith('.') else f'{only["content"]}.',
+            'value': require_root_domain(only["content"]),
         }
 
     _data_for_ALIAS = _data_for_CNAME
@@ -236,7 +243,7 @@ class SelectelProvider(BaseProvider):
                     'priority': record['priority'],
                     'weight': record['weight'],
                     'port': record['port'],
-                    'target': record["target"] if record["target"].endswith('.') else f'{record["target"]}.',
+                    'target': require_root_domain(record["target"]),
                 }
             )
 
