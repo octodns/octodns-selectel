@@ -67,6 +67,23 @@ class TestSelectelProvider(TestCase):
         )
     )
 
+    api_record.append(
+        {
+            'type': 'CNAME',
+            'ttl': 300,
+            'content': 'unit.tests',
+            'name': 'wwwdot.unit.tests.',
+            'id': 12,
+        }
+    )
+    expected.add(
+        Record.new(
+            zone,
+            'wwwdot',
+            {'ttl': 300, 'type': 'CNAME', 'value': 'unit.tests.'},
+        )
+    )
+
     # MX
     api_record.append(
         {
@@ -109,6 +126,15 @@ class TestSelectelProvider(TestCase):
             'id': 7,
         }
     )
+    api_record.append(
+        {
+            'type': 'NS',
+            'ttl': 600,
+            'content': 'ns3.unit.tests.',
+            'name': 'unit.tests',
+            'id': 7,
+        }
+    )
     expected.add(
         Record.new(
             zone,
@@ -116,7 +142,11 @@ class TestSelectelProvider(TestCase):
             {
                 'ttl': 600,
                 'type': 'NS',
-                'values': ['ns1.unit.tests.', 'ns2.unit.tests.'],
+                'values': [
+                    'ns1.unit.tests.',
+                    'ns2.unit.tests.',
+                    'ns3.unit.tests.',
+                ],
             },
         )
     )
@@ -352,8 +382,8 @@ class TestSelectelProvider(TestCase):
             zone.add_record(record)
 
         plan = provider.plan(zone)
-        self.assertEqual(9, len(plan.changes))
-        self.assertEqual(9, provider.apply(plan))
+        self.assertEqual(10, len(plan.changes))
+        self.assertEqual(10, provider.apply(plan))
 
     @requests_mock.Mocker()
     def test_domain_list(self, fake_http):
@@ -411,8 +441,8 @@ class TestSelectelProvider(TestCase):
             zone.add_record(record)
 
         plan = provider.plan(zone)
-        self.assertEqual(9, len(plan.changes))
-        self.assertEqual(9, provider.apply(plan))
+        self.assertEqual(10, len(plan.changes))
+        self.assertEqual(10, provider.apply(plan))
 
     @requests_mock.Mocker()
     def test_delete_no_exist_record(self, fake_http):
@@ -477,8 +507,8 @@ class TestSelectelProvider(TestCase):
             zone.add_record(record)
 
         plan = provider.plan(zone)
-        self.assertEqual(9, len(plan.changes))
-        self.assertEqual(9, provider.apply(plan))
+        self.assertEqual(10, len(plan.changes))
+        self.assertEqual(10, provider.apply(plan))
 
     @requests_mock.Mocker()
     def test_include_change_returns_false(self, fake_http):
