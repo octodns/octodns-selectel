@@ -183,10 +183,18 @@ class SelectelProvider(BaseProvider):
                 'fingerprint': value.fingerprint,
             }
 
+    def _params_for_TXT(self, record):
+        for value in record.values:
+            yield {
+                'content': value.replace('\\', ''),
+                'name': record.fqdn,
+                'ttl': max(self.MIN_TTL, record.ttl),
+                'type': record._type,
+            }
+            
     _params_for_A = _params_for_multiple
     _params_for_AAAA = _params_for_multiple
     _params_for_NS = _params_for_multiple
-    _params_for_TXT = _params_for_multiple
 
     _params_for_CNAME = _params_for_single
     _params_for_ALIAS = _params_for_single
