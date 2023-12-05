@@ -17,11 +17,6 @@ from octodns.record import Record, Update
 __version__ = __VERSION__ = '0.0.3'
 
 
-def escape_semicolon(s):
-    assert s
-    return s.replace(';', '\\;')
-
-
 def require_root_domain(fqdn):
     if fqdn.endswith('.'):
         return fqdn
@@ -233,7 +228,7 @@ class SelectelProvider(BaseProvider):
         return {
             'ttl': records[0]['ttl'],
             'type': _type,
-            'values': [escape_semicolon(r['content']) for r in records],
+            'values': [r['content'] for r in records],
         }
 
     def _data_for_SRV(self, _type, records):
