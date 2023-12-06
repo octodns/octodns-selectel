@@ -1,3 +1,10 @@
+## v0.0.4 - 2023-12-06 - Bug fix
+
+#### Changes
+
+* Remove function forcing escaping semicolon in TXT content which caused record updating even if no changes were done to it 
+
+
 ## v0.0.3 - 2022-09-01 - New records and bug fix
 
 #### Changes
