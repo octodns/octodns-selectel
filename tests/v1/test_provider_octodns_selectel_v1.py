@@ -1,7 +1,3 @@
-#
-#
-#
-
 from unittest import TestCase
 
 import requests_mock
@@ -10,7 +6,7 @@ from requests.exceptions import HTTPError
 from octodns.record import Record, Update
 from octodns.zone import Zone
 
-from octodns_selectel import SelectelProvider
+from octodns_selectel.v1.provider import SelectelProvider
 
 
 class TestSelectelProvider(TestCase):
@@ -396,6 +392,19 @@ class TestSelectelProvider(TestCase):
         provider = SelectelProvider(123, 'test_token')
 
         result = provider.domain_list()
+        self.assertEqual(result, expected)
+
+    @requests_mock.Mocker()
+    def test_list_zones(self, fake_http):
+        fake_http.get(f'{self.API_URL}/', json=self.domain)
+        fake_http.head(
+            f'{self.API_URL}/', headers={'X-Total-Count': str(len(self.domain))}
+        )
+
+        expected = ['unit.tests.']
+        provider = SelectelProvider(123, 'test_token')
+
+        result = provider.list_zones()
         self.assertEqual(result, expected)
 
     @requests_mock.Mocker()
