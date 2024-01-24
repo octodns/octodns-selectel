@@ -75,7 +75,7 @@ class SelectelProvider(BaseProvider):
                 and rrset["name"] == rrset_name,
                 self._zone_rrsets[zone_name],
             )
-        )["uuid"]
+        )["id"]
 
     def _apply_create(self, zone_id, change):
         new_record = change.new
@@ -124,7 +124,7 @@ class SelectelProvider(BaseProvider):
         self.log.info('populate: found %s records', len(zone.records) - before)
 
     def _get_zone_id_by_name(self, zone_name):
-        return self._zones.get(zone_name, False)["uuid"]
+        return self._zones.get(zone_name, False)["id"]
 
     def create_zone(self, name):
         self.log.debug('Create zone: %s', name)

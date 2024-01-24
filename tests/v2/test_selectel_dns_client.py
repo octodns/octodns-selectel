@@ -8,8 +8,8 @@ from octodns_selectel.v2.exceptions import ApiException
 
 class TestSelectelDNSClient(TestCase):
     zone_name = "test-octodns.ru."
-    zone_uuid = "01073035-cc25-4956-b0c9-b3a270091c37"
-    rrset_uuid = "03073035-dd25-4956-b0c9-k91270091d95"
+    zone_id = "01073035-cc25-4956-b0c9-b3a270091c37"
+    rrset_id = "03073035-dd25-4956-b0c9-k91270091d95"
     project_id = "763219cb96c141978e8d45da637ae75c"
     library_version = "0.0.1"
     openstack_token = "some-openstack-token"
@@ -18,7 +18,7 @@ class TestSelectelDNSClient(TestCase):
     _PAGINATION_OFFSET = 0
     _rrsets = [
         dict(
-            uuid="0eb2f04e-74fd-4264-a4b8-396e5fc95f00",
+            id="0eb2f04e-74fd-4264-a4b8-396e5fc95f00",
             name=zone_name,
             ttl=3600,
             type="SOA",
@@ -29,10 +29,10 @@ class TestSelectelDNSClient(TestCase):
                     disabled=False,
                 )
             ],
-            zone=zone_uuid,
+            zone_id=zone_id,
         ),
         dict(
-            uuid="0eb2f04e-74fd-4264-a4b8-396e5fc95f00",
+            id="0eb2f04e-74fd-4264-a4b8-396e5fc95f00",
             name=zone_name,
             ttl=3600,
             type="NS",
@@ -42,7 +42,7 @@ class TestSelectelDNSClient(TestCase):
                 dict(content="c.ns.selectel.ru.", disabled=False),
                 dict(content="d.ns.selectel.ru.", disabled=False),
             ],
-            zone=zone_uuid,
+            zone_id=zone_id,
         ),
     ]
     _response_list_rrset_without_offset = dict(
@@ -98,13 +98,13 @@ class TestSelectelDNSClient(TestCase):
             error="zone_not_found", description="invalid value"
         )
         fake_http.get(
-            f'{DNSClient.API_URL}/zones/{self.zone_uuid}/rrset',
+            f'{DNSClient.API_URL}/zones/{self.zone_id}/rrset',
             headers={"X-Auth-Token": self.openstack_token},
             status_code=404,
             json=bad_response_with_resource_not_found,
         )
         with self.assertRaises(ApiException) as api_exception:
-            self.dns_client.list_rrsets(self.zone_uuid)
+            self.dns_client.list_rrsets(self.zone_id)
         self.assertEqual(
             f'Resource not found: {bad_response_with_resource_not_found["error"]}.',
             str(api_exception.exception),
@@ -116,13 +116,13 @@ class TestSelectelDNSClient(TestCase):
             error="this_rrset_is_already_exists", description="invalid value"
         )
         fake_http.get(
-            f'{DNSClient.API_URL}/zones/{self.zone_uuid}/rrset',
+            f'{DNSClient.API_URL}/zones/{self.zone_id}/rrset',
             headers={"X-Auth-Token": self.openstack_token},
             status_code=409,
             json=bad_response_with_resource_not_found,
         )
         with self.assertRaises(ApiException) as api_exception:
-            self.dns_client.list_rrsets(self.zone_uuid)
+            self.dns_client.list_rrsets(self.zone_id)
         self.assertEqual(
             f'Conflict: {bad_response_with_resource_not_found["error"]}.',
             str(api_exception.exception),
@@ -144,33 +144,33 @@ class TestSelectelDNSClient(TestCase):
     def test_request_all_entities_without_offset(self, fake_http):
         response_without_offset = self._response_list_rrset_without_offset
         fake_http.get(
-            f'{DNSClient.API_URL}/zones/{self.zone_uuid}/rrset',
+            f'{DNSClient.API_URL}/zones/{self.zone_id}/rrset',
             headers={"X-Auth-Token": self.openstack_token},
             status_code=200,
             json=response_without_offset,
         )
         all_entities = self.dns_client._request_all_entities(
-            DNSClient._rrset_path(self.zone_uuid)
+            DNSClient._rrset_path(self.zone_id)
         )
         self.assertEqual(response_without_offset["result"], all_entities)
 
     @requests_mock.Mocker()
     def test_request_all_entities_with_offset(self, fake_http):
         fake_http.get(
-            f'{DNSClient.API_URL}/zones/{self.zone_uuid}/rrset?limit={self._PAGINATION_LIMIT}',
+            f'{DNSClient.API_URL}/zones/{self.zone_id}/rrset?limit={self._PAGINATION_LIMIT}',
             headers={"X-Auth-Token": self.openstack_token},
             status_code=200,
             json=self._response_list_rrset_with_offset,
         )
         fake_http.get(
-            f'{DNSClient.API_URL}/zones/{self.zone_uuid}/'
+            f'{DNSClient.API_URL}/zones/{self.zone_id}/'
             f'rrset?limit={self._PAGINATION_LIMIT}&offset=2',
             headers={"X-Auth-Token": self.openstack_token},
             status_code=200,
             json=self._response_list_rrset_without_offset,
         )
         all_entities = self.dns_client._request_all_entities(
-            DNSClient._rrset_path(self.zone_uuid)
+            DNSClient._rrset_path(self.zone_id)
         )
         result_list = []
         result_list.extend(self._rrsets)
@@ -184,7 +184,7 @@ class TestSelectelDNSClient(TestCase):
             next_offset=0,
             result=[
                 dict(
-                    uuid="0eb2f07g-74fd-4271-a4b8-396e5fc95f60",
+                    id="0eb2f07g-74fd-4271-a4b8-396e5fc95f60",
                     name=self.zone_name,
                     project_id=self.project_id,
                     created_at="2023-12-22T12:44:36Z",
@@ -209,7 +209,7 @@ class TestSelectelDNSClient(TestCase):
     @requests_mock.Mocker()
     def test_create_zone_success(self, fake_http):
         response_created_zone = dict(
-            uuid="bdd902e7-7270-44c8-8d18-120fa5e1e5d4",
+            id="bdd902e7-7270-44c8-8d18-120fa5e1e5d4",
             name=self.zone_name,
             project_id=self.project_id,
             created_at="2023-12-22T15:07:31Z",
@@ -232,12 +232,12 @@ class TestSelectelDNSClient(TestCase):
     @requests_mock.Mocker()
     def test_list_rrsets_success(self, fake_http):
         fake_http.get(
-            f'{DNSClient.API_URL}/zones/{self.zone_uuid}/rrset',
+            f'{DNSClient.API_URL}/zones/{self.zone_id}/rrset',
             headers={"X-Auth-Token": self.openstack_token},
             status_code=200,
             json=self._response_list_rrset_without_offset,
         )
-        rrsets = self.dns_client.list_rrsets(self.zone_uuid)
+        rrsets = self.dns_client.list_rrsets(self.zone_id)
         self.assertEqual(
             self._response_list_rrset_without_offset["result"], rrsets
         )
@@ -245,7 +245,7 @@ class TestSelectelDNSClient(TestCase):
     @requests_mock.Mocker()
     def test_create_rrset_success(self, fake_http):
         response_created_rrset = dict(
-            uuid=self.rrset_uuid,
+            id=self.rrset_id,
             name=self.zone_name,
             project_id=self.project_id,
             created_at="2023-12-22T15:07:31Z",
@@ -257,22 +257,22 @@ class TestSelectelDNSClient(TestCase):
             last_check_status=False,
         )
         fake_http.post(
-            f'{DNSClient.API_URL}/zones/{self.zone_uuid}/rrset',
+            f'{DNSClient.API_URL}/zones/{self.zone_id}/rrset',
             headers={"X-Auth-Token": self.openstack_token},
             status_code=200,
             json=response_created_rrset,
         )
-        rrsets = self.dns_client.create_rrset(self.zone_uuid, dict())
+        rrsets = self.dns_client.create_rrset(self.zone_id, dict())
         self.assertEqual(response_created_rrset, rrsets)
 
     @requests_mock.Mocker()
     def test_delete_rrset_success(self, fake_http):
         fake_http.delete(
-            f'{DNSClient.API_URL}/zones/{self.zone_uuid}/rrset/{self.rrset_uuid}',
+            f'{DNSClient.API_URL}/zones/{self.zone_id}/rrset/{self.rrset_id}',
             headers={"X-Auth-Token": self.openstack_token},
             status_code=200,
         )
         response_from_delete = self.dns_client.delete_rrset(
-            self.zone_uuid, self.rrset_uuid
+            self.zone_id, self.rrset_id
         )
         self.assertEqual(dict(), response_from_delete)

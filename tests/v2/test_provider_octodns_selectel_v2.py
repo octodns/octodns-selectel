@@ -12,19 +12,19 @@ from octodns_selectel.v2.provider import SelectelProvider
 
 
 class TestSelectelProvider(TestCase):
-    _zone_uuid = str(uuid.uuid4())
+    _zone_id = str(uuid.uuid4())
     _zone_name = 'unit.tests.'
     _ttl = 3600
     rrsets = []
     octodns_zone = Zone(_zone_name, [])
     expected_records = set()
-    selectel_zones = [dict(uuid=_zone_uuid, name=_zone_name)]
+    selectel_zones = [dict(id=_zone_id, name=_zone_name)]
     _version = '0.0.1'
     _openstack_token = 'some-openstack-token'
 
-    def _a_rrset(self, uuid, hostname):
+    def _a_rrset(self, id, hostname):
         return dict(
-            uuid=uuid,
+            id=id,
             name=f'{hostname}.{self._zone_name}'
             if hostname
             else self._zone_name,
@@ -33,9 +33,9 @@ class TestSelectelProvider(TestCase):
             records=[dict(content='1.2.3.4'), dict(content='5.6.7.8')],
         )
 
-    def _aaaa_rrset(self, uuid, hostname):
+    def _aaaa_rrset(self, id, hostname):
         return dict(
-            uuid=uuid,
+            id=id,
             name=f'{hostname}.{self._zone_name}'
             if hostname
             else self._zone_name,
@@ -47,9 +47,9 @@ class TestSelectelProvider(TestCase):
             ],
         )
 
-    def _cname_rrset(self, uuid, hostname):
+    def _cname_rrset(self, id, hostname):
         return dict(
-            uuid=uuid,
+            id=id,
             name=f'{hostname}.{self._zone_name}'
             if hostname
             else self._zone_name,
@@ -58,9 +58,9 @@ class TestSelectelProvider(TestCase):
             records=[dict(content=self._zone_name)],
         )
 
-    def _mx_rrset(self, uuid, hostname):
+    def _mx_rrset(self, id, hostname):
         return dict(
-            uuid=uuid,
+            id=id,
             name=f'{hostname}.{self._zone_name}'
             if hostname
             else self._zone_name,
@@ -69,9 +69,9 @@ class TestSelectelProvider(TestCase):
             records=[dict(content=f'10 mx.{self._zone_name}')],
         )
 
-    def _ns_rrset(self, uuid, hostname):
+    def _ns_rrset(self, id, hostname):
         return dict(
-            uuid=uuid,
+            id=id,
             name=f'{hostname}.{self._zone_name}'
             if hostname
             else self._zone_name,
@@ -84,9 +84,9 @@ class TestSelectelProvider(TestCase):
             ],
         )
 
-    def _srv_rrset(self, uuid, hostname):
+    def _srv_rrset(self, id, hostname):
         return dict(
-            uuid=uuid,
+            id=id,
             name=f'{hostname}.{self._zone_name}'
             if hostname
             else self._zone_name,
@@ -98,9 +98,9 @@ class TestSelectelProvider(TestCase):
             ],
         )
 
-    def _txt_rrset(self, uuid, hostname):
+    def _txt_rrset(self, id, hostname):
         return dict(
-            uuid=uuid,
+            id=id,
             name=f'{hostname}.{self._zone_name}'
             if hostname
             else self._zone_name,
@@ -109,9 +109,9 @@ class TestSelectelProvider(TestCase):
             records=[dict(content='"Foo1"'), dict(content='"Foo2"')],
         )
 
-    def _sshfp_rrset(self, uuid, hostname):
+    def _sshfp_rrset(self, id, hostname):
         return dict(
-            uuid=uuid,
+            id=id,
             name=f'{hostname}.{self._zone_name}'
             if hostname
             else self._zone_name,
@@ -122,113 +122,111 @@ class TestSelectelProvider(TestCase):
 
     def setUp(self):
         # A, subdomain=''
-        a_uuid = str(uuid.uuid4())
-        self.rrsets.append(self._a_rrset(a_uuid, ''))
+        a_id = str(uuid.uuid4())
+        self.rrsets.append(self._a_rrset(a_id, ''))
         self.expected_records.add(
             Record.new(
                 self.octodns_zone,
                 '',
-                data=to_octodns_record_data(self._a_rrset(a_uuid, '')),
+                data=to_octodns_record_data(self._a_rrset(a_id, '')),
             )
         )
         # A, subdomain='sub'
-        a_sub_uuid = str(uuid.uuid4())
-        self.rrsets.append(self._a_rrset(a_sub_uuid, 'sub'))
+        a_sub_id = str(uuid.uuid4())
+        self.rrsets.append(self._a_rrset(a_sub_id, 'sub'))
         self.expected_records.add(
             Record.new(
                 self.octodns_zone,
                 'sub',
-                data=to_octodns_record_data(self._a_rrset(a_sub_uuid, 'sub')),
+                data=to_octodns_record_data(self._a_rrset(a_sub_id, 'sub')),
             )
         )
 
         # CNAME, subdomain='www2'
-        cname_uuid = str(uuid.uuid4())
-        self.rrsets.append(self._cname_rrset(cname_uuid, 'www2'))
+        cname_id = str(uuid.uuid4())
+        self.rrsets.append(self._cname_rrset(cname_id, 'www2'))
         self.expected_records.add(
             Record.new(
                 self.octodns_zone,
                 'www2',
                 data=to_octodns_record_data(
-                    self._cname_rrset(cname_uuid, 'www2')
+                    self._cname_rrset(cname_id, 'www2')
                 ),
             )
         )
         # CNAME, subdomain='wwwdot'
-        cname_sub_uuid = str(uuid.uuid4())
-        self.rrsets.append(self._cname_rrset(cname_sub_uuid, 'wwwdot'))
+        cname_sub_id = str(uuid.uuid4())
+        self.rrsets.append(self._cname_rrset(cname_sub_id, 'wwwdot'))
         self.expected_records.add(
             Record.new(
                 self.octodns_zone,
                 'wwwdot',
                 data=to_octodns_record_data(
-                    self._cname_rrset(cname_sub_uuid, 'wwwdot')
+                    self._cname_rrset(cname_sub_id, 'wwwdot')
                 ),
             )
         )
         # MX, subdomain=''
-        mx_uuid = str(uuid.uuid4())
-        self.rrsets.append(self._mx_rrset(mx_uuid, ''))
+        mx_id = str(uuid.uuid4())
+        self.rrsets.append(self._mx_rrset(mx_id, ''))
         self.expected_records.add(
             Record.new(
                 self.octodns_zone,
                 '',
-                data=to_octodns_record_data(self._mx_rrset(mx_uuid, '')),
+                data=to_octodns_record_data(self._mx_rrset(mx_id, '')),
             )
         )
         # NS, subdomain='www3'
-        ns_sub_uuid = str(uuid.uuid4())
-        self.rrsets.append(self._ns_rrset(ns_sub_uuid, 'www3'))
+        ns_sub_id = str(uuid.uuid4())
+        self.rrsets.append(self._ns_rrset(ns_sub_id, 'www3'))
         self.expected_records.add(
             Record.new(
                 self.octodns_zone,
                 'www3',
-                data=to_octodns_record_data(
-                    self._ns_rrset(ns_sub_uuid, 'www3')
-                ),
+                data=to_octodns_record_data(self._ns_rrset(ns_sub_id, 'www3')),
             )
         )
         # AAAA, subdomain=''
-        aaaa_uuid = str(uuid.uuid4())
-        self.rrsets.append(self._aaaa_rrset(aaaa_uuid, ''))
+        aaaa_id = str(uuid.uuid4())
+        self.rrsets.append(self._aaaa_rrset(aaaa_id, ''))
         self.expected_records.add(
             Record.new(
                 self.octodns_zone,
                 '',
-                data=to_octodns_record_data(self._aaaa_rrset(aaaa_uuid, '')),
+                data=to_octodns_record_data(self._aaaa_rrset(aaaa_id, '')),
             )
         )
         # SRV, subdomain='_srv._tcp'
-        srv_uuid = str(uuid.uuid4())
-        self.rrsets.append(self._srv_rrset(srv_uuid, '_srv._tcp'))
+        srv_id = str(uuid.uuid4())
+        self.rrsets.append(self._srv_rrset(srv_id, '_srv._tcp'))
         self.expected_records.add(
             Record.new(
                 self.octodns_zone,
                 '_srv._tcp',
                 data=to_octodns_record_data(
-                    self._srv_rrset(srv_uuid, '_srv._tcp')
+                    self._srv_rrset(srv_id, '_srv._tcp')
                 ),
             )
         )
         # TXT, subdomain='txt'
-        txt_uuid = str(uuid.uuid4())
-        self.rrsets.append(self._txt_rrset(txt_uuid, 'txt'))
+        txt_id = str(uuid.uuid4())
+        self.rrsets.append(self._txt_rrset(txt_id, 'txt'))
         self.expected_records.add(
             Record.new(
                 self.octodns_zone,
                 'txt',
-                data=to_octodns_record_data(self._txt_rrset(srv_uuid, 'txt')),
+                data=to_octodns_record_data(self._txt_rrset(txt_id, 'txt')),
             )
         )
         # SSHFP, subdomain='sshfp'
-        sshfp_uuid = str(uuid.uuid4())
-        self.rrsets.append(self._sshfp_rrset(sshfp_uuid, 'sshfp'))
+        sshfp_id = str(uuid.uuid4())
+        self.rrsets.append(self._sshfp_rrset(sshfp_id, 'sshfp'))
         self.expected_records.add(
             Record.new(
                 self.octodns_zone,
                 'sshfp',
                 data=to_octodns_record_data(
-                    self._sshfp_rrset(sshfp_uuid, 'sshfp')
+                    self._sshfp_rrset(sshfp_id, 'sshfp')
                 ),
             )
         )
@@ -249,7 +247,7 @@ class TestSelectelProvider(TestCase):
             ),
         )
         fake_http.get(
-            f'{DNSClient.API_URL}/zones/{self._zone_uuid}/'
+            f'{DNSClient.API_URL}/zones/{self._zone_id}/'
             f'rrset?limit={DNSClient._PAGINATION_LIMIT}&offset=0',
             json=dict(
                 result=self.rrsets, limit=len(self.rrsets), next_offset=0
@@ -274,12 +272,12 @@ class TestSelectelProvider(TestCase):
             ),
         )
         fake_http.get(
-            f'{DNSClient.API_URL}/zones/{self._zone_uuid}/'
+            f'{DNSClient.API_URL}/zones/{self._zone_id}/'
             f'rrset?limit={DNSClient._PAGINATION_LIMIT}&offset=0',
             json=dict(result=list(), limit=0, next_offset=0),
         )
         fake_http.post(
-            f'{DNSClient.API_URL}/zones/{self._zone_uuid}/rrset', json=dict()
+            f'{DNSClient.API_URL}/zones/{self._zone_id}/rrset', json=dict()
         )
 
         provider = SelectelProvider(
@@ -297,21 +295,21 @@ class TestSelectelProvider(TestCase):
     @requests_mock.Mocker()
     def test_apply_with_create_zone(self, fake_http):
         zone_name_for_created = 'octodns-zone.test.'
-        zone_uuid = "bdd902e7-7270-44c8-8d18-120fa5e1e5d4"
+        zone_id = "bdd902e7-7270-44c8-8d18-120fa5e1e5d4"
         fake_http.get(
             f'{DNSClient.API_URL}/zones',
             json=dict(result=list(), limit=0, next_offset=0),
         )
         fake_http.get(
-            f'{DNSClient.API_URL}/zones/{zone_uuid}/'
+            f'{DNSClient.API_URL}/zones/{zone_id}/'
             f'rrset?limit={DNSClient._PAGINATION_LIMIT}&offset=0',
             json=dict(result=list(), limit=0, next_offset=0),
         )
         fake_http.post(
             f'{DNSClient.API_URL}/zones',
-            json=dict(uuid=zone_uuid, name=zone_name_for_created),
+            json=dict(id=zone_id, name=zone_name_for_created),
         )
-        fake_http.post(f'{DNSClient.API_URL}/zones/{zone_uuid}/rrset')
+        fake_http.post(f'{DNSClient.API_URL}/zones/{zone_id}/rrset')
         zone = Zone(zone_name_for_created, [])
         provider = SelectelProvider(
             self._version, self._openstack_token, strict_supports=False
@@ -354,7 +352,7 @@ class TestSelectelProvider(TestCase):
             ),
         )
         fake_http.get(
-            f'{DNSClient.API_URL}/zones/{self._zone_uuid}/'
+            f'{DNSClient.API_URL}/zones/{self._zone_id}/'
             f'rrset?limit={DNSClient._PAGINATION_LIMIT}&offset=0',
             json=dict(
                 result=rrsets_with_not_supporting_type,
@@ -390,10 +388,10 @@ class TestSelectelProvider(TestCase):
             data=to_octodns_record_data(updated_rrset),
         )
         fake_http.get(
-            f'{DNSClient.API_URL}/zones/{self._zone_uuid}/'
+            f'{DNSClient.API_URL}/zones/{self._zone_id}/'
             f'rrset?limit={DNSClient._PAGINATION_LIMIT}&offset=0',
             json=dict(
-                result=[self._a_rrset(updated_rrset["uuid"], '')],
+                result=[self._a_rrset(updated_rrset["id"], '')],
                 limit=len(self.rrsets),
                 next_offset=0,
             ),
@@ -401,7 +399,7 @@ class TestSelectelProvider(TestCase):
 
         updated_rrset["ttl"] *= 2
         fake_http.patch(
-            f'{DNSClient.API_URL}/zones/{self._zone_uuid}/rrset/{updated_rrset["uuid"]}',
+            f'{DNSClient.API_URL}/zones/{self._zone_id}/rrset/{updated_rrset["id"]}',
             status_code=204,
         )
 
@@ -436,10 +434,10 @@ class TestSelectelProvider(TestCase):
             data=to_octodns_record_data(updated_rrset),
         )
         fake_http.get(
-            f'{DNSClient.API_URL}/zones/{self._zone_uuid}/'
+            f'{DNSClient.API_URL}/zones/{self._zone_id}/'
             f'rrset?limit={DNSClient._PAGINATION_LIMIT}&offset=0',
             json=dict(
-                result=[self._a_rrset(updated_rrset["uuid"], '')],
+                result=[self._a_rrset(updated_rrset["id"], '')],
                 limit=len(self.rrsets),
                 next_offset=0,
             ),
@@ -447,7 +445,7 @@ class TestSelectelProvider(TestCase):
 
         updated_rrset["ttl"] *= 2
         fake_http.patch(
-            f'{DNSClient.API_URL}/zones/{self._zone_uuid}/rrset/{updated_rrset["uuid"]}',
+            f'{DNSClient.API_URL}/zones/{self._zone_id}/rrset/{updated_rrset["id"]}',
             status_code=500,
         )
 
@@ -482,17 +480,17 @@ class TestSelectelProvider(TestCase):
             data=to_octodns_record_data(deleted_rrset),
         )
         fake_http.get(
-            f'{DNSClient.API_URL}/zones/{self._zone_uuid}/'
+            f'{DNSClient.API_URL}/zones/{self._zone_id}/'
             f'rrset?limit={DNSClient._PAGINATION_LIMIT}&offset=0',
             json=dict(
-                result=[self._a_rrset(deleted_rrset["uuid"], '')],
+                result=[self._a_rrset(deleted_rrset["id"], '')],
                 limit=len(self.rrsets),
                 next_offset=0,
             ),
         )
 
         fake_http.delete(
-            f'{DNSClient.API_URL}/zones/{self._zone_uuid}/rrset/{deleted_rrset["uuid"]}'
+            f'{DNSClient.API_URL}/zones/{self._zone_id}/rrset/{deleted_rrset["id"]}'
         )
 
         zone = Zone(self._zone_name, [])
@@ -517,7 +515,7 @@ class TestSelectelProvider(TestCase):
             ),
         )
         fake_http.get(
-            f'{DNSClient.API_URL}/zones/{self._zone_uuid}/'
+            f'{DNSClient.API_URL}/zones/{self._zone_id}/'
             f'rrset?limit={DNSClient._PAGINATION_LIMIT}&offset=0',
             json=dict(
                 result=self.rrsets, limit=len(self.rrsets), next_offset=0
@@ -531,7 +529,7 @@ class TestSelectelProvider(TestCase):
         )
 
         fake_http.delete(
-            f'{DNSClient.API_URL}/zones/{self._zone_uuid}/rrset/{deleted_rrset["uuid"]}',
+            f'{DNSClient.API_URL}/zones/{self._zone_id}/rrset/{deleted_rrset["id"]}',
             status_code=500,
         )
 
