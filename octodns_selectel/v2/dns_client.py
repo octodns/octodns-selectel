@@ -58,7 +58,7 @@ class DNSClient:
         else:
             raise ApiException('Internal server error.')
 
-    def _request_all_entities(self, path, offset=0) -> list[int]:
+    def _request_all_entities(self, path, offset=0):
         items = []
         resp = self._request(
             "GET", path, dict(limit=self._PAGINATION_LIMIT, offset=offset)
