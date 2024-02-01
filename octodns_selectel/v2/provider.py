@@ -4,6 +4,7 @@
 
 from logging import getLogger
 
+from octodns.idna import idna_decode
 from octodns.provider.base import BaseProvider
 from octodns.record import Record, SshfpRecord, Update
 
@@ -49,10 +50,10 @@ class SelectelProvider(BaseProvider):
     def _apply(self, plan):
         desired = plan.desired
         changes = plan.changes
+        zone_name = idna_decode(desired.name)
         self.log.debug(
-            '_apply: zone=%s, len(changes)=%d', desired.name, len(changes)
+            '_apply: zone=%s, len(changes)=%d', zone_name, len(changes)
         )
-        zone_name = desired.name
         if not self._is_zone_already_created(zone_name):
             self.create_zone(zone_name)
         zone_id = self._get_zone_id_by_name(zone_name)
@@ -85,7 +86,9 @@ class SelectelProvider(BaseProvider):
     def _apply_update(self, zone_id, change):
         existing = change.existing
         rrset_id = self._get_rrset_id(
-            existing.zone.name, existing._type, existing.fqdn
+            idna_decode(existing.zone.name),
+            existing._type,
+            idna_decode(existing.fqdn),
         )
         data_for_update = to_selectel_rrset(change.new)
         self.update_rrset(zone_id, rrset_id, data_for_update)
@@ -93,20 +96,23 @@ class SelectelProvider(BaseProvider):
     def _apply_delete(self, zone_id, change):
         existing = change.existing
         rrset_id = self._get_rrset_id(
-            existing.zone.name, existing._type, existing.fqdn
+            idna_decode(existing.zone.name),
+            existing._type,
+            idna_decode(existing.fqdn),
         )
         self.delete_rrset(zone_id, rrset_id)
 
     def populate(self, zone, target=False, lenient=False):
+        zone_name = idna_decode(zone.name)
         self.log.debug(
             'populate: name=%s, target=%s, lenient=%s',
-            zone.name,
+            zone_name,
             target,
             lenient,
         )
         before = len(zone.records)
         rrsets = []
-        if self._is_zone_already_created(zone.name):
+        if self._is_zone_already_created(zone_name):
             rrsets = self.list_rrsets(zone)
         for rrset in rrsets:
             rrset_type = rrset['type']
@@ -142,10 +148,11 @@ class SelectelProvider(BaseProvider):
         return {zone['name']: zone for zone in self._client.list_zones()}
 
     def list_rrsets(self, zone):
-        self.log.debug('View rrsets. Zone: %s', zone.name)
-        zone_id = self._get_zone_id_by_name(zone.name)
+        zone_name = idna_decode(zone.name)
+        self.log.debug('View rrsets. Zone: %s', zone_name)
+        zone_id = self._get_zone_id_by_name(zone_name)
         zone_rrsets = self._client.list_rrsets(zone_id)
-        self._zone_rrsets[zone.name] = zone_rrsets
+        self._zone_rrsets[zone_name] = zone_rrsets
         return zone_rrsets
 
     def create_rrset(self, zone_id, data):
