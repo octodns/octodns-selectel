@@ -4,12 +4,12 @@ from logging import getLogger
 from requests import Session
 from requests.exceptions import HTTPError
 
-from octodns import __VERSION__ as octodns_version
+from octodns import __version__ as octodns_version
 from octodns.provider import ProviderException
 from octodns.provider.base import BaseProvider
 from octodns.record import Record, Update
 
-from octodns_selectel.version import version as provider_version
+from octodns_selectel.version import __version__ as provider_version
 
 
 def require_root_domain(fqdn):

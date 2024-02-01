@@ -8,7 +8,7 @@ from octodns.idna import idna_decode
 from octodns.provider.base import BaseProvider
 from octodns.record import Record, SshfpRecord, Update
 
-from octodns_selectel.version import version as provider_version
+from octodns_selectel.version import __version__ as provider_version
 
 from .dns_client import DNSClient
 from .exceptions import ApiException
