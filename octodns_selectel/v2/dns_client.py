@@ -1,6 +1,6 @@
 from requests import Session
 
-from octodns import __VERSION__ as octodns_version
+from octodns import __version__ as octodns_version
 
 from .exceptions import ApiException
 
