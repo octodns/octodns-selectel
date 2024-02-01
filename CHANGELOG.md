@@ -1,4 +1,4 @@
-## v1.0.0 - 2024-02-01 - Support for DNSv2 API and structural project changes
+## v0.99.0 - 2024-02-01 - Support for DNSv2 API and structural project changes
 
 #### Changes
 
