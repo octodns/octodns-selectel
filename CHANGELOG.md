@@ -1,3 +1,21 @@
+## v0.99.0 - 2024-02-01 - Support for DNSv2 API and structural project changes
+
+#### Changes
+
+* Move existing provider and related tests to separate directories `v1`
+* Rename public name from `SelectelProvider` to `SelectelProviderLegacy`
+* Add `list_zones()` method to support "*" for planning
+* Fix SSHFP parsing bug, caused by trailing dot in fingerprint which lead to constant re-update of record
+* Move version varible to separate file, since now it is utilized by two providers. Storing it in `__init__.py` causes cycling imports
+* Update `script/release` and `setup.py` to parse version from another location
+* Update `readme.md` with focus on new provider
+
+#### New
+
+* Add new `SelectelProvider` class to support v2 API
+* Isolate API calls into separate class
+* Add tests for SelectelProvider
+
 ## v0.0.4 - 2023-12-06 - Bug fix
 
 #### Changes
