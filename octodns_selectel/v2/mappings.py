@@ -1,5 +1,10 @@
 from string import Template
 
+from octodns_selectel.escaping_semicolon import (
+    escape_semicolon,
+    unescape_semicolon,
+)
+
 from .exceptions import SelectelException
 
 
@@ -17,7 +22,8 @@ def to_selectel_rrset(record):
         rrset_records = [{'content': record.value}]
     elif record._type == "TXT":
         rrset_records = [
-            dict(content=f'\"{value}\"') for value in record.values
+            dict(content=f'\"{unescape_semicolon(value)}\"')
+            for value in record.values
         ]
     elif record._type == "MX":
         rrset_records = list(
@@ -76,7 +82,10 @@ def to_octodns_record_data(rrset):
         key_for_record_values = "value"
         record_values = rrset["records"][0]["content"]
     elif rrset_type == "TXT":
-        record_values = [r['content'].strip('"\'') for r in rrset["records"]]
+        record_values = [
+            escape_semicolon(r['content']).strip('"\'')
+            for r in rrset["records"]
+        ]
     elif rrset_type == "MX":
         for record in rrset["records"]:
             preference, exchange = record["content"].split(" ")

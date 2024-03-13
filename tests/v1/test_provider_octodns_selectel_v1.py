@@ -259,6 +259,28 @@ class TestSelectelProvider(TestCase):
         )
     )
 
+    # TXT with semicolon
+    api_record.append(
+        {
+            'type': 'TXT',
+            'ttl': 300,
+            'content': 'v=DKIM1; k=rsa; p=some-key',
+            'name': 'dkim.unit.tests',
+            'id': 18,
+        }
+    )
+    expected.add(
+        Record.new(
+            zone,
+            'dkim',
+            {
+                'ttl': 200,
+                'type': 'TXT',
+                'value': 'v=DKIM1\\; k=rsa\\; p=some-key',
+            },
+        )
+    )
+
     # SSHFP
     api_record.append(
         {
@@ -378,8 +400,8 @@ class TestSelectelProvider(TestCase):
             zone.add_record(record)
 
         plan = provider.plan(zone)
-        self.assertEqual(10, len(plan.changes))
-        self.assertEqual(10, provider.apply(plan))
+        self.assertEqual(11, len(plan.changes))
+        self.assertEqual(11, provider.apply(plan))
 
     @requests_mock.Mocker()
     def test_domain_list(self, fake_http):
@@ -450,8 +472,8 @@ class TestSelectelProvider(TestCase):
             zone.add_record(record)
 
         plan = provider.plan(zone)
-        self.assertEqual(10, len(plan.changes))
-        self.assertEqual(10, provider.apply(plan))
+        self.assertEqual(11, len(plan.changes))
+        self.assertEqual(11, provider.apply(plan))
 
     @requests_mock.Mocker()
     def test_delete_no_exist_record(self, fake_http):
@@ -516,8 +538,8 @@ class TestSelectelProvider(TestCase):
             zone.add_record(record)
 
         plan = provider.plan(zone)
-        self.assertEqual(10, len(plan.changes))
-        self.assertEqual(10, provider.apply(plan))
+        self.assertEqual(11, len(plan.changes))
+        self.assertEqual(11, provider.apply(plan))
 
     @requests_mock.Mocker()
     def test_include_change_returns_false(self, fake_http):

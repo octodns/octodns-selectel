@@ -9,6 +9,10 @@ from octodns.provider import ProviderException
 from octodns.provider.base import BaseProvider
 from octodns.record import Record, Update
 
+from octodns_selectel.escaping_semicolon import (
+    escape_semicolon,
+    unescape_semicolon,
+)
 from octodns_selectel.version import __version__ as provider_version
 
 
@@ -149,6 +153,15 @@ class SelectelProvider(BaseProvider):
             'type': record._type,
         }
 
+    def _params_for_TXT(self, record):
+        for value in record.values:
+            yield {
+                'content': unescape_semicolon(value),
+                'name': record.fqdn,
+                'ttl': max(self.MIN_TTL, record.ttl),
+                'type': record._type,
+            }
+
     def _params_for_MX(self, record):
         for value in record.values:
             yield {
@@ -185,7 +198,6 @@ class SelectelProvider(BaseProvider):
     _params_for_A = _params_for_multiple
     _params_for_AAAA = _params_for_multiple
     _params_for_NS = _params_for_multiple
-    _params_for_TXT = _params_for_multiple
 
     _params_for_CNAME = _params_for_single
     _params_for_ALIAS = _params_for_single
@@ -231,7 +243,7 @@ class SelectelProvider(BaseProvider):
         return {
             'ttl': records[0]['ttl'],
             'type': _type,
-            'values': [r['content'] for r in records],
+            'values': [escape_semicolon(r['content']) for r in records],
         }
 
     def _data_for_SRV(self, _type, records):

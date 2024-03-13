@@ -1,3 +1,10 @@
+## v0.99.2 - 2024-03-13 - Add escaping semicolon for TXT records
+
+#### Changes
+
+* Add escaping semicolon for TXT records in `SelectelProvider` and `SelectelProviderLegacy`
+
+
 ## v0.99.1 - 2024-02-01 - Fix project structure for distribution
 
 #### Changes
