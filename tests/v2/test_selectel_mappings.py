@@ -269,6 +269,8 @@ class TestSelectelMappings(TestCase):
 
     def test_mapping_record_txt(self):
         txt_list = ["\"Buzz\"", "\"Fizz\""]
+        unescaping_dkim_value = "\"v=DKIM1; k=rsa; p=some-key\""
+        escaping_dkim_value = "\"v=DKIM1\\; k=rsa\\; p=some-key\""
         test_pairs = (
             PairTest(
                 TxtRecord(
@@ -305,6 +307,19 @@ class TestSelectelMappings(TestCase):
                         dict(content=txt_list[0]),
                         dict(content=txt_list[1]),
                     ],
+                ),
+            ),
+            PairTest(
+                TxtRecord(
+                    self.zone,
+                    "dkim",
+                    dict(ttl=self.ttl, value=escaping_dkim_value),
+                ),
+                dict(
+                    name=f"dkim.{self.zone.name}",
+                    ttl=self.ttl,
+                    type="TXT",
+                    records=[dict(content=unescaping_dkim_value)],
                 ),
             ),
         )
