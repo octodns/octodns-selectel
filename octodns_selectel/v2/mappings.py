@@ -11,6 +11,7 @@ from .exceptions import SelectelException
 def to_selectel_rrset(record):
     rrset = dict(name=record.fqdn, ttl=record.ttl, type=record._type)
     rrset_records = []
+    content_caa_tmpl = Template("$flag $tag \"$value\"")
     content_mx_tmpl = Template("$preference $exchange")
     content_srv_tmpl = Template("$priority $weight $port $target")
     content_sshfp_tmpl = Template("$algorithm $fingerprint_type $fingerprint")
@@ -18,11 +19,20 @@ def to_selectel_rrset(record):
         rrset_records = list(
             map(lambda value: {'content': value}, record.values)
         )
-    elif record._type in {"CNAME", "ALIAS"}:
+    elif record._type in {"CNAME", "ALIAS", "DNAME"}:
         rrset_records = [{'content': record.value}]
     elif record._type == "TXT":
         rrset_records = [
             dict(content=f'\"{unescape_semicolon(value)}\"')
+            for value in record.values
+        ]
+    elif record._type == "CAA":
+        rrset_records = [
+            dict(
+                content=content_caa_tmpl.substitute(
+                    flag=value.flags, tag=value.tag, value=value.value
+                )
+            )
             for value in record.values
         ]
     elif record._type == "MX":
@@ -78,7 +88,7 @@ def to_octodns_record_data(rrset):
     key_for_record_values = "values"
     if rrset_type in {"A", "AAAA", "NS"}:
         record_values = [r['content'] for r in rrset["records"]]
-    elif rrset_type in {"CNAME", "ALIAS"}:
+    elif rrset_type in {"CNAME", "ALIAS", "DNAME"}:
         key_for_record_values = "value"
         record_values = rrset["records"][0]["content"]
     elif rrset_type == "TXT":
@@ -86,6 +96,12 @@ def to_octodns_record_data(rrset):
             escape_semicolon(r['content']).strip('"\'')
             for r in rrset["records"]
         ]
+    elif rrset_type == "CAA":
+        for record in rrset["records"]:
+            flag, tag, value = record["content"].split(" ")
+            record_values.append(
+                {'flags': flag, 'tag': tag, 'value': value.strip("\"")}
+            )
     elif rrset_type == "MX":
         for record in rrset["records"]:
             preference, exchange = record["content"].split(" ")

@@ -5,7 +5,9 @@ from octodns.record import (
     AaaaRecord,
     AliasRecord,
     ARecord,
+    CaaRecord,
     CnameRecord,
+    DnameRecord,
     MxRecord,
     SrvRecord,
     SshfpRecord,
@@ -156,6 +158,42 @@ class TestSelectelMappings(TestCase):
                             )
                         )
                     ),
+                    list(map(lambda value: value.rdata_text, tc.record.values)),
+                )
+
+    def _caa_to_string(self, caa):
+        return f'{caa["flags"]} {caa["tag"]} {caa["value"]}'
+
+    def _assert_mapping_caa(self, test_pairs):
+        for tc in test_pairs:
+            with self.subTest():
+                rrset_from_record = to_selectel_rrset(tc.record)
+                self.assertListEqual(
+                    list(
+                        map(
+                            lambda value: value.get("content"),
+                            rrset_from_record.get("records"),
+                        )
+                    ),
+                    # octodns class CaaRecord __repr__ output with quotes
+                    # and selectel backend use quotes
+                    list(map(lambda value: str(value), tc.record.values)),
+                )
+
+                record_data_from_rrset = to_octodns_record_data(tc.rrset)
+                self.assertListEqual(
+                    sorted(
+                        list(
+                            map(
+                                lambda caa_value: self._caa_to_string(
+                                    caa_value
+                                ),
+                                record_data_from_rrset.get("values"),
+                            )
+                        )
+                    ),
+                    # octodns class CaaRecord __repr__ output with quotes
+                    # but rdata_text output without quotes
                     list(map(lambda value: value.rdata_text, tc.record.values)),
                 )
 
@@ -518,6 +556,39 @@ class TestSelectelMappings(TestCase):
         self._assert_mapping_common(test_pairs)
         self._assert_mapping_value(test_pairs)
 
+    def test_mapping_record_dname(self):
+        dname_value = f"a.{self.zone.name}"
+        test_pairs = (
+            PairTest(
+                DnameRecord(
+                    self.zone,
+                    "dname",
+                    dict(type="DNAME", ttl=self.ttl, value=dname_value),
+                ),
+                dict(
+                    name=f"dname.{self.zone.name}",
+                    ttl=self.ttl,
+                    type="DNAME",
+                    records=[dict(content=dname_value)],
+                ),
+            ),
+            PairTest(
+                DnameRecord(
+                    self.zone,
+                    "",
+                    dict(type="DNAME", ttl=self.ttl, value=dname_value),
+                ),
+                dict(
+                    name=self.zone.name,
+                    ttl=self.ttl,
+                    type="DNAME",
+                    records=[dict(content=dname_value)],
+                ),
+            ),
+        )
+        self._assert_mapping_common(test_pairs)
+        self._assert_mapping_value(test_pairs)
+
     def test_mapping_record_alias(self):
         cname_value = "proxydomain.ru."
         test_pairs = (
@@ -550,6 +621,68 @@ class TestSelectelMappings(TestCase):
         )
         self._assert_mapping_common(test_pairs)
         self._assert_mapping_value(test_pairs)
+
+    def test_mapping_record_caa(self):
+        caa_list_dict = [
+            dict(flags="0", tag="issue", value="ca.example.net"),
+            dict(flags="0", tag="issue", value=";"),
+            dict(
+                flags="0", tag="iodef", value="mailto:notification@example.com"
+            ),
+        ]
+        caa_list_str = [
+            self._caa_to_string(caa_dict_item)
+            for caa_dict_item in caa_list_dict
+        ]
+        test_pairs = (
+            PairTest(
+                CaaRecord(
+                    self.zone,
+                    "caa",
+                    dict(type="CAA", ttl=self.ttl, value=caa_list_dict[0]),
+                ),
+                dict(
+                    name=f"caa.{self.zone.name}",
+                    ttl=self.ttl,
+                    type="CAA",
+                    records=[dict(content=caa_list_str[0])],
+                ),
+            ),
+            PairTest(
+                CaaRecord(
+                    self.zone,
+                    "caa",
+                    dict(type="CAA", ttl=self.ttl, values=caa_list_dict),
+                ),
+                dict(
+                    name=f"caa.{self.zone.name}",
+                    ttl=self.ttl,
+                    type="CAA",
+                    records=[
+                        dict(content=caa_str_item)
+                        for caa_str_item in caa_list_str
+                    ],
+                ),
+            ),
+            PairTest(
+                CaaRecord(
+                    self.zone,
+                    "",
+                    dict(type="CAA", ttl=self.ttl, values=caa_list_dict),
+                ),
+                dict(
+                    name=self.zone.name,
+                    ttl=self.ttl,
+                    type="CAA",
+                    records=[
+                        dict(content=caa_str_item)
+                        for caa_str_item in caa_list_str
+                    ],
+                ),
+            ),
+        )
+        self._assert_mapping_common(test_pairs)
+        self._assert_mapping_caa(test_pairs)
 
     def test_mapping_record_raise_exception_invalid_type(self):
         invalid_type_record = ARecord(

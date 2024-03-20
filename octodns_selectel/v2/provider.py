@@ -18,7 +18,19 @@ from .mappings import to_octodns_record_data, to_selectel_rrset
 class SelectelProvider(BaseProvider):
     SUPPORTS_GEO = False
     SUPPORTS = set(
-        ('A', 'AAAA', 'ALIAS', 'CNAME', 'MX', 'NS', 'TXT', 'SRV', 'SSHFP')
+        (
+            'A',
+            'AAAA',
+            'ALIAS',
+            'CAA',
+            'CNAME',
+            'DNAME',
+            'MX',
+            'NS',
+            'TXT',
+            'SRV',
+            'SSHFP',
+        )
     )
     MIN_TTL = 60
 
