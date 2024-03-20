@@ -25,9 +25,9 @@ class TestSelectelProvider(TestCase):
     def _a_rrset(self, id, hostname):
         return dict(
             id=id,
-            name=f'{hostname}.{self._zone_name}'
-            if hostname
-            else self._zone_name,
+            name=(
+                f'{hostname}.{self._zone_name}' if hostname else self._zone_name
+            ),
             type='A',
             ttl=self._ttl,
             records=[dict(content='1.2.3.4'), dict(content='5.6.7.8')],
@@ -36,9 +36,9 @@ class TestSelectelProvider(TestCase):
     def _aaaa_rrset(self, id, hostname):
         return dict(
             id=id,
-            name=f'{hostname}.{self._zone_name}'
-            if hostname
-            else self._zone_name,
+            name=(
+                f'{hostname}.{self._zone_name}' if hostname else self._zone_name
+            ),
             type='AAAA',
             ttl=self._ttl,
             records=[
@@ -50,9 +50,9 @@ class TestSelectelProvider(TestCase):
     def _cname_rrset(self, id, hostname):
         return dict(
             id=id,
-            name=f'{hostname}.{self._zone_name}'
-            if hostname
-            else self._zone_name,
+            name=(
+                f'{hostname}.{self._zone_name}' if hostname else self._zone_name
+            ),
             type='CNAME',
             ttl=self._ttl,
             records=[dict(content=self._zone_name)],
@@ -61,9 +61,9 @@ class TestSelectelProvider(TestCase):
     def _mx_rrset(self, id, hostname):
         return dict(
             id=id,
-            name=f'{hostname}.{self._zone_name}'
-            if hostname
-            else self._zone_name,
+            name=(
+                f'{hostname}.{self._zone_name}' if hostname else self._zone_name
+            ),
             type='MX',
             ttl=self._ttl,
             records=[dict(content=f'10 mx.{self._zone_name}')],
@@ -72,9 +72,9 @@ class TestSelectelProvider(TestCase):
     def _ns_rrset(self, id, hostname):
         return dict(
             id=id,
-            name=f'{hostname}.{self._zone_name}'
-            if hostname
-            else self._zone_name,
+            name=(
+                f'{hostname}.{self._zone_name}' if hostname else self._zone_name
+            ),
             type='NS',
             ttl=self._ttl,
             records=[
@@ -87,9 +87,9 @@ class TestSelectelProvider(TestCase):
     def _srv_rrset(self, id, hostname):
         return dict(
             id=id,
-            name=f'{hostname}.{self._zone_name}'
-            if hostname
-            else self._zone_name,
+            name=(
+                f'{hostname}.{self._zone_name}' if hostname else self._zone_name
+            ),
             type='SRV',
             ttl=self._ttl,
             records=[
@@ -101,9 +101,9 @@ class TestSelectelProvider(TestCase):
     def _txt_rrset(self, id, hostname):
         return dict(
             id=id,
-            name=f'{hostname}.{self._zone_name}'
-            if hostname
-            else self._zone_name,
+            name=(
+                f'{hostname}.{self._zone_name}' if hostname else self._zone_name
+            ),
             type='TXT',
             ttl=self._ttl,
             records=[dict(content='"Foo1"'), dict(content='"Foo2"')],
@@ -112,9 +112,9 @@ class TestSelectelProvider(TestCase):
     def _sshfp_rrset(self, id, hostname):
         return dict(
             id=id,
-            name=f'{hostname}.{self._zone_name}'
-            if hostname
-            else self._zone_name,
+            name=(
+                f'{hostname}.{self._zone_name}' if hostname else self._zone_name
+            ),
             type='SSHFP',
             ttl=self._ttl,
             records=[dict(content='1 1 123456789abcdef')],
