@@ -23,7 +23,7 @@ pip install octodns octodns-selectel
 
 | What              | Value                                             |
 |-------------------|---------------------------------------------------|
-| Supported records | A, AAAA, ALIAS, CNAME, MX, NS, SRV, SSHFP, TXT    |
+| Supported records | A, AAAA, ALIAS, CAA, CNAME, DNAME, MX, NS, SRV, SSHFP, TXT    |
 | Dynamic records   | ❌ |
 
 ## Configuration
@@ -110,6 +110,19 @@ _sip._tcp:
       priority: 20
       target: phone2.example.com.
       weight: 0     
+
+caa:
+  - ttl: 3600
+    type: CAA
+    values:
+    - flags: 0
+      tag: issue
+      value: octodns-test.com.
+
+dname:
+  - ttl: 3600
+    type: DNAME
+    value: octodns-test.com.
 
 foo:
   - ttl: 3600
