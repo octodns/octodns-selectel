@@ -3,7 +3,7 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-VERSION="$(grep "^__version__" "./octodns_selectel/__init__.py" | sed -e "s/.* = '//" -e "s/'$//")"
+VERSION="$(grep "^__version__" "$ROOT/octodns_selectel/version.py" | sed -e "s/.* = '//" -e "s/'$//")"
 
 echo "## create test venv ############################################################"
 TMP_DIR=$(mktemp -d -t ci-XXXXXXXXXX)
