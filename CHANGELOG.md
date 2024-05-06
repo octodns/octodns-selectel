@@ -1,3 +1,9 @@
+## v0.99.3 - 2024-05-06 - Add supporting DNAME and CAA records
+
+#### Changes
+
+* Add supporting DNAME and CAA records in `SelectelProvider`
+
 ## v0.99.2 - 2024-03-14 - Add escaping semicolon for TXT records
 
 #### Changes
