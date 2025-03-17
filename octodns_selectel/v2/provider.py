@@ -140,6 +140,8 @@ class SelectelProvider(BaseProvider):
                 )
                 zone.add_record(record)
         self.log.info('populate: found %s records', len(zone.records) - before)
+        exists = zone.name in self._zones
+        return exists
 
     def _get_zone_id_by_name(self, zone_name):
         return self._zones.get(zone_name, False)["id"]
