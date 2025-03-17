@@ -61,9 +61,9 @@ class DNSClient:
     def _request_all_entities(self, path, offset=0):
         items = []
         resp = self._request(
-            "GET", 
-            path, 
-            dict(limit=self._PAGINATION_LIMIT, offset=offset, sort_by="name.descend")
+            "GET",
+            path,
+            dict(limit=self._PAGINATION_LIMIT, offset=offset, sort_by="name.descend"),
         )
         items.extend(resp["result"])
         if next_offset := resp["next_offset"]:
