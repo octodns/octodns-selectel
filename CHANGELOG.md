@@ -1,3 +1,10 @@
+## v0.99.4 - 2025-03-18 - Bug fix
+
+#### Changes
+
+* Fix space in value of CAA record in `SelectelProvider`
+* Fix bug with duplicates record error on big zones in `SelectelProvider`
+
 ## v0.99.3 - 2024-05-06 - Add supporting DNAME and CAA records
 
 #### Changes
