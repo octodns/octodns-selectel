@@ -1,3 +1,7 @@
+## v1.0.0 - 2025-05-04 - Long overdue 1.0
+
+* Require octodns >= 1.5.0
+
 ## v0.99.4 - 2025-03-18 - Bug fix
 
 #### Changes
