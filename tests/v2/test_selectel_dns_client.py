@@ -14,7 +14,7 @@ class TestSelectelDNSClient(TestCase):
     library_version = "0.0.1"
     openstack_token = "some-openstack-token"
     dns_client = DNSClient(library_version, openstack_token)
-    _PAGINATION_LIMIT = 50
+    _PAGINATION_LIMIT = 1000
     _PAGINATION_OFFSET = 0
     _rrsets = [
         dict(
