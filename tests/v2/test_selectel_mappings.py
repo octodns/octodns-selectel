@@ -130,7 +130,7 @@ class TestSelectelMappings(TestCase):
                 )
 
     def _sshfp_to_string(self, sshfp):
-        return f'{sshfp["algorithm"]} {sshfp["fingerprint_type"]} {sshfp["fingerprint"]}'
+        return f'{sshfp["algorithm"]} {sshfp["fingerprint_type"]} {sshfp["fingerprint"].lower()}'
 
     def _assert_mapping_sshfp(self, test_pairs):
         for tc in test_pairs:
@@ -158,7 +158,12 @@ class TestSelectelMappings(TestCase):
                             )
                         )
                     ),
-                    list(map(lambda value: value.rdata_text, tc.record.values)),
+                    list(
+                        map(
+                            lambda value: value.rdata_text.lower(),
+                            tc.record.values,
+                        )
+                    ),
                 )
 
     def _caa_to_string(self, caa):
