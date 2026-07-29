@@ -167,7 +167,7 @@ class TestSelectelMappings(TestCase):
                 )
 
     def _caa_to_string(self, caa):
-        return f'{caa["flags"]} {caa["tag"]} {caa["value"]}'
+        return f'{caa["flags"]} {caa["tag"]} "{caa["value"]}"'
 
     def _assert_mapping_caa(self, test_pairs):
         for tc in test_pairs:
@@ -197,8 +197,6 @@ class TestSelectelMappings(TestCase):
                             )
                         )
                     ),
-                    # octodns class CaaRecord __repr__ output with quotes
-                    # but rdata_text output without quotes
                     list(map(lambda value: value.rdata_text, tc.record.values)),
                 )
 
