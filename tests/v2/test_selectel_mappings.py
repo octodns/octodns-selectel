@@ -1,6 +1,7 @@
 import collections
 from unittest import TestCase
 
+from octodns import __version__ as OCTODNS_VERSION
 from octodns.record import (
     AaaaRecord,
     AliasRecord,
@@ -22,6 +23,15 @@ from octodns_selectel.v2.mappings import (
 )
 
 PairTest = collections.namedtuple("PairTest", ["record", "rrset"])
+
+# octodns/octodns#1449 fixed CaaValue.rdata_text to quote the value field per
+# RFC 8659, matching NAPTR/URI; that fix first ships in this release.
+_CAA_RDATA_TEXT_QUOTED_SINCE = (1, 21, 1)
+
+
+def _caa_rdata_text_is_quoted():
+    version = tuple(int(p) for p in OCTODNS_VERSION.split(".")[:3])
+    return version >= _CAA_RDATA_TEXT_QUOTED_SINCE
 
 
 class TestSelectelMappings(TestCase):
@@ -167,6 +177,8 @@ class TestSelectelMappings(TestCase):
                 )
 
     def _caa_to_string(self, caa):
+        if _caa_rdata_text_is_quoted():
+            return f'{caa["flags"]} {caa["tag"]} "{caa["value"]}"'
         return f'{caa["flags"]} {caa["tag"]} {caa["value"]}'
 
     def _assert_mapping_caa(self, test_pairs):
@@ -197,8 +209,6 @@ class TestSelectelMappings(TestCase):
                             )
                         )
                     ),
-                    # octodns class CaaRecord __repr__ output with quotes
-                    # but rdata_text output without quotes
                     list(map(lambda value: value.rdata_text, tc.record.values)),
                 )
 
